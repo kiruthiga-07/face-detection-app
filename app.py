@@ -5,12 +5,10 @@ from PIL import Image
 
 st.title("Face Counter App")
 
-# Load face model
 face_cascade = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 )
 
-# -------- IMAGE UPLOAD --------
 st.header("Upload Photo")
 
 uploaded_file = st.file_uploader("Choose an image", type=["jpg", "png", "jpeg"])
@@ -30,10 +28,9 @@ if uploaded_file is not None:
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x+w, y+h), (0,255,0), 2)
 
-    st.image(img, caption=f"Faces detected: {len(faces)}", use_column_width=True)
+    st.image(img, caption=f"Faces detected: {len(faces)}", width="stretch")
 
 
-# -------- CAMERA --------
 st.header("Camera")
 
 camera_image = st.camera_input("Take a picture")
@@ -53,4 +50,4 @@ if camera_image is not None:
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x+w, y+h), (0,255,0), 2)
 
-    st.image(img, caption=f"Faces detected: {len(faces)}", use_column_width=True)
+    st.image(img, caption=f"Faces detected: {len(faces)}", width="stretch")
