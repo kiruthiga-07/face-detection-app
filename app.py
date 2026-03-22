@@ -2,12 +2,11 @@ import streamlit as st
 import cv2
 import numpy as np
 from PIL import Image
-from streamlit_camera_input_live import camera_input_live
 
 st.set_page_config(page_title="Face Detection", page_icon="😀")
 
 st.title("😀 Face Detection App")
-st.write("Detect faces from camera or photo")
+st.write("Detect faces using camera or upload image")
 
 
 face_cascade = cv2.CascadeClassifier(
@@ -16,7 +15,7 @@ face_cascade = cv2.CascadeClassifier(
 )
 
 
-def detect_faces(img):
+def detect(img):
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -39,43 +38,43 @@ def detect_faces(img):
     return img, len(faces)
 
 
-# --------------------
-# Upload Image
-# --------------------
+# -------------------
+# Upload
+# -------------------
 
-st.subheader("Upload Photo")
+st.subheader("Upload Image")
 
 file = st.file_uploader(
-    "Upload image",
+    "Choose image",
     type=["jpg","png","jpeg"]
 )
 
-if file is not None:
+if file:
 
     image = Image.open(file)
     img = np.array(image)
 
-    img, count = detect_faces(img)
+    img, count = detect(img)
 
     st.image(img, channels="BGR")
 
     st.success(f"Faces detected: {count}")
 
 
-# --------------------
+# -------------------
 # Camera
-# --------------------
+# -------------------
 
 st.subheader("Camera")
 
-photo = camera_input_live()
+photo = st.camera_input("Take photo")
 
-if photo is not None:
+if photo:
 
-    img = Image.open(photo)
-    img = np.array(img)
+    image = Image.open(photo)
+    img = np.array(image)
 
-    img, count = detect_faces(img)
+    img, count = detect(img)
 
     st.image(img, channels="BGR")
 
