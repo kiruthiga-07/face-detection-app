@@ -3,79 +3,54 @@ import cv2
 import numpy as np
 from PIL import Image
 
-st.set_page_config(page_title="Face Detection", page_icon="😀")
+st.title("Face Counter App")
 
-st.title("😀 Face Detection App")
-st.write("Detect faces using camera or upload image")
-
-
+# Load face model
 face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades +
-    "haarcascade_frontalface_default.xml"
+    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 )
 
+# -------- IMAGE UPLOAD --------
+st.header("Upload Photo")
 
-def detect(img):
+uploaded_file = st.file_uploader("Choose an image", type=["jpg", "png", "jpeg"])
+
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    img = np.array(image)
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     faces = face_cascade.detectMultiScale(
         gray,
-        1.3,
-        5
+        scaleFactor=1.3,
+        minNeighbors=5
     )
 
     for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x, y), (x+w, y+h), (0,255,0), 2)
 
-        cv2.rectangle(
-            img,
-            (x, y),
-            (x+w, y+h),
-            (0,255,0),
-            2
-        )
-
-    return img, len(faces)
+    st.image(img, caption=f"Faces detected: {len(faces)}", use_column_width=True)
 
 
-# -------------------
-# Upload
-# -------------------
+# -------- CAMERA --------
+st.header("Camera")
 
-st.subheader("Upload Image")
+camera_image = st.camera_input("Take a picture")
 
-file = st.file_uploader(
-    "Choose image",
-    type=["jpg","png","jpeg"]
-)
-
-if file:
-
-    image = Image.open(file)
+if camera_image is not None:
+    image = Image.open(camera_image)
     img = np.array(image)
 
-    img, count = detect(img)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    st.image(img, channels="BGR")
+    faces = face_cascade.detectMultiScale(
+        gray,
+        scaleFactor=1.3,
+        minNeighbors=5
+    )
 
-    st.success(f"Faces detected: {count}")
+    for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x, y), (x+w, y+h), (0,255,0), 2)
 
-
-# -------------------
-# Camera
-# -------------------
-
-st.subheader("Camera")
-
-photo = st.camera_input("Take photo")
-
-if photo:
-
-    image = Image.open(photo)
-    img = np.array(image)
-
-    img, count = detect(img)
-
-    st.image(img, channels="BGR")
-
-    st.success(f"Faces detected: {count}")
+    st.image(img, caption=f"Faces detected: {len(faces)}", use_column_width=True)
